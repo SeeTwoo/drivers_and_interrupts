@@ -33,7 +33,7 @@ static int __init hello_1_init(void)
 			my_handler,
 			IRQF_SHARED,
 			MY_DEV_NAME,
-			my_dev);
+			(void *)(&my_dev));
 	if (result) {
 		pr_err("Failed to reserve IRQ");
 		return result;
