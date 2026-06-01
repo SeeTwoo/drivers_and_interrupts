@@ -16,6 +16,8 @@ struct s_device {
 	void __iomem	*regs;
 };
 
+static struct s_device	my_dev;
+
 static irqreturn_t	my_handler(int irq, void *dev_id)
 {
 	pr_info("Interrupt occured\n");
@@ -27,7 +29,6 @@ static int __init hello_1_init(void)
 	pr_info("hello, world 1.\n");
 
 	int		result;
-	struct s_device	my_dev;
 
 	result = request_irq(DA_KEYBOARD_IRQ,
 			my_handler,
