@@ -14,7 +14,7 @@
 struct s_device {
 	int		irq;
 	void __iomem	*regs;
-}
+};
 
 static irqreturn_t	my_handler(int irq, void *dev_id)
 {
