@@ -44,7 +44,7 @@ static int __init hello_1_init(void)
 
 static void __exit hello_1_exit(void)
 {
-	free_irq(DA_KEYBOARD_IRQ, my_dev);
+	free_irq(DA_KEYBOARD_IRQ, (void *)(&my_dev));
 	pr_info("goodbye, world 1.\n");
 }
 
