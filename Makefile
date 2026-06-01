@@ -1,4 +1,3 @@
-obj-m += hello-1.o
 obj-m += driver.o
 
 PWD := $(CURDIR)
