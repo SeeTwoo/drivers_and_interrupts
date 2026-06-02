@@ -5,24 +5,31 @@
 #include <linux/notifier.h>
 #include <linux/printk.h>
 
-#ifndef DA_KEYBOARD_IRQ
-# define DA_KEYBOARD_IRQ 1
-#endif
-
-#ifndef MY_DEV_NAME
-# define MY_DEV_NAME "shit"
-#endif
-
-//part about keyboard notifiers
+static const char	keycodes[256] = {
+	[0 ... 18] = '\0';
+	[19] = 'p';
+	[20] = 'y';
+	[21] = 'f';
+	[22] = 'g';
+	[23] = 'c';
+	[24] = 'r';
+	[25] = 'l';
+	[26] = '/';
+	[27 ... 255] = '\0';
+}
 
 static int	keyboard_event(struct notifier_block *nb, unsigned long action, void *data)
 {
 	struct keyboard_notifier_param	*param = data;
+	char				c = keycodes[param->value];
 
 	if (action != KBD_KEYCODE)
 		return NOTIFY_OK;
 
-	pr_info("keycode=%u %s\n", param->value, param->down ? "pressed" : "released");
+	if (c)
+		pr_info("keycode=%c %s\n", c, param->down ? "pressed" : "released");
+	else
+		pr_info("unknown keycode %s\n", param->down ? "pressed" : "released");
 	return NOTIFY_OK;
 }
 
