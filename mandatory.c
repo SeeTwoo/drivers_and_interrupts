@@ -15,7 +15,18 @@ static const char	keycodes[256] = {
 	[24] = 'r',
 	[25] = 'l',
 	[26] = '/',
-	[27 ... 255] = '\0',
+	[27 ... 29] = '\0',
+	[30] = 'a',
+	[31] = 'o',
+	[32] = 'e',
+	[33] = 'u',
+	[34] = 'i',
+	[35] = 'd',
+	[36] = 'h',
+	[37] = 't',
+	[38] = 'n',
+	[39] = 's',
+	[40 ... 255] = '\0',
 };
 
 static int	keyboard_event(struct notifier_block *nb, unsigned long action, void *data)
