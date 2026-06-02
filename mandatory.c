@@ -6,17 +6,17 @@
 #include <linux/printk.h>
 
 static const char	keycodes[256] = {
-	[0 ... 18] = '\0';
-	[19] = 'p';
-	[20] = 'y';
-	[21] = 'f';
-	[22] = 'g';
-	[23] = 'c';
-	[24] = 'r';
-	[25] = 'l';
-	[26] = '/';
-	[27 ... 255] = '\0';
-}
+	[0 ... 18] = '\0',
+	[19] = 'p',
+	[20] = 'y',
+	[21] = 'f',
+	[22] = 'g',
+	[23] = 'c',
+	[24] = 'r',
+	[25] = 'l',
+	[26] = '/',
+	[27 ... 255] = '\0',
+};
 
 static int	keyboard_event(struct notifier_block *nb, unsigned long action, void *data)
 {
