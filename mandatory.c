@@ -17,10 +17,12 @@
 
 static int	keyboard_event(struct notifier_block *nb, unsigned long action, void *data)
 {
+	struct keyboard_notifier_param	*param = data;
+
 	if (action != KBD_KEYCODE)
 		return NOTIFY_OK;
 
-	pr_info("keycode=%u %s\n", data->value, data->down ? "pressed" : "released");
+	pr_info("keycode=%u %s\n", param->value, param->down ? "pressed" : "released");
 	return NOTIFY_OK;
 }
 

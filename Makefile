@@ -1,4 +1,5 @@
-obj-m += driver.o
+obj-m += bonus.o
+obj-m += mandatory.o
 
 PWD := $(CURDIR)
 
