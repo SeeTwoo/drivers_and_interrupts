@@ -32,42 +32,15 @@ static struct notifier_block	keyboard_nb = {
 
 
 //part about interrupts
-
-struct s_device {
-	int		irq;
-	void __iomem	*regs;
-};
-
-static struct s_device	my_dev;
-
-static irqreturn_t	my_handler(int irq, void *dev_id)
-{
-	//pr_info("Interrupt occured\n");
-	return IRQ_HANDLED;
-}
-
 static int __init hello_1_init(void)
 {
 	pr_info("hello, world 1.\n");
-
-	int		result;
-
-	result = request_irq(DA_KEYBOARD_IRQ,
-			my_handler,
-			IRQF_SHARED,
-			MY_DEV_NAME,
-			(void *)(&my_dev));
-	if (result) {
-		pr_err("Failed to reserve IRQ");
-		return result;
-	}
 	register_keyboard_notifier(&keyboard_nb);
 	return 0;
 }
 
 static void __exit hello_1_exit(void)
 {
-	free_irq(DA_KEYBOARD_IRQ, (void *)(&my_dev));
 	unregister_keyboard_notifier(&keyboard_nb);
 	pr_info("goodbye, world 1.\n");
 }
