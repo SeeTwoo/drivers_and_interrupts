@@ -142,20 +142,20 @@ static struct notifier_block	keyboard_nb = {
 	.notifier_call = keyboard_event,
 };
 
-static int __init drivers_and_interrupts_init(void)
+static int __init dni_init(void)
 {
 	pr_info("hi from the 42 keylogger\n");
 	register_keyboard_notifier(&keyboard_nb);
 	return 0;
 }
 
-static void __exit drivers_and_interrupts_exit(void)
+static void __exit dni_exit(void)
 {
 	unregister_keyboard_notifier(&keyboard_nb);
 	pr_info("by from the 42 keylogger\n");
 }
 
-module_init(drivers_and_interrupts_init);
-module_exit(drivers_and_interrputs_exit);
+module_init(dni_init);
+module_exit(dni_exit);
 
 MODULE_LICENSE("GPL");
