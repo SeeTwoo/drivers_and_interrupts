@@ -25,7 +25,6 @@ static const struct s_key keys[] = {
 	{9, "eight", '8'},
 	{10, "nine", '9'},
 	{11, "zero", '0'},
-<<<<<<< HEAD
 	{12, "bracketleft", '['},
 	{13, "bracketright", ']'},
 	{14, "Delete", '\177'},
