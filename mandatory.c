@@ -1,10 +1,12 @@
 #include <linux/init.h>
 #include <linux/interrupt.h>
+#include <linux/kernel.h>
 #include <linux/keyboard.h>
 #include <linux/module.h>
 #include <linux/notifier.h>
 #include <linux/printk.h>
-#include <linux/kernel.h>
+#include <linux/timekeeping.h>
+#include <linux/time.h>
 
 struct s_key {
 	uint64_t	keycode;
@@ -131,10 +133,20 @@ static int	keyboard_event(struct notifier_block *nb, unsigned long action, void 
 {
 	struct keyboard_notifier_param	*param = data;
 	struct s_key			key = keys[param->value];
+	struct timespec64		ts;
+	struct tm			tm;
 
 	if (action != KBD_KEYCODE)
 		return NOTIFY_OK;
-	pr_info("%s (%llu) %s\n", key.name, key.keycode, param->down ? "pressed" : "released");
+	ktime_get_real_ts64(&ts);
+	time64_to_tm(ts.tv_sec, 0, &tm);
+	pr_info("%02d:%02d:%02d %s (%llu) %s\n", 
+			tm.tm_hour,
+			tm.tm_min,
+			tm.tm_sec,
+			key.name, 
+			key.keycode, 
+			param->down ? "pressed" : "released");
 	return NOTIFY_OK;
 }
 
