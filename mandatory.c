@@ -4,7 +4,7 @@
 #include <linux/module.h>
 #include <linux/notifier.h>
 #include <linux/printk.h>
-#include <linux/kenel.h>
+#include <linux/kernel.h>
 
 struct s_key {
 	uint64_t	keycode;
@@ -142,20 +142,20 @@ static struct notifier_block	keyboard_nb = {
 	.notifier_call = keyboard_event,
 };
 
-static int __init hello_1_init(void)
+static int __init drivers_and_interrupts_init(void)
 {
-	pr_info("hello, world 1.\n");
+	pr_info("hi from the 42 keylogger\n");
 	register_keyboard_notifier(&keyboard_nb);
 	return 0;
 }
 
-static void __exit hello_1_exit(void)
+static void __exit drivers_and_interrupts_exit(void)
 {
 	unregister_keyboard_notifier(&keyboard_nb);
-	pr_info("goodbye, world 1.\n");
+	pr_info("by from the 42 keylogger\n");
 }
 
-module_init(hello_1_init);
-module_exit(hello_1_exit);
+module_init(drivers_and_interrupts_init);
+module_exit(drivers_and_interrputs_exit);
 
 MODULE_LICENSE("GPL");
