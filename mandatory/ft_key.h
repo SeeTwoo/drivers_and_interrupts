@@ -14,6 +14,7 @@ struct s_keystroke {
 	struct list_head	list;
 	struct s_key		key;
 	struct tm		tm;
+	u8			down;
 };
 
 #endif
