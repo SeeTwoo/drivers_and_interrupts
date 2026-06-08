@@ -73,7 +73,7 @@ static int	keyboard_event(struct notifier_block *nb, unsigned long action, void 
 	struct keyboard_notifier_param	*param = data;
 	struct timespec64		ts;
 	struct s_keystroke		*stroke;
-	u64				flags;
+	unsigned long			flags;
 
 	stroke = kmalloc(sizeof(struct s_keystroke), GFP_ATOMIC);
 	if (!stroke || action != KBD_KEYCODE)
