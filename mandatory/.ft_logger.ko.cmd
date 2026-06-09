@@ -1,1 +1,0 @@
-savedcmd_ft_logger.ko := ld -r -m elf_x86_64 -z noexecstack --no-warn-rwx-segments --build-id=sha1  -T /sources/linux-6.18.10/scripts/module.lds -o ft_logger.ko ft_logger.o ft_logger.mod.o .module-common.o
