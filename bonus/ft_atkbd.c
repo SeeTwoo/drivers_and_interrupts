@@ -1,3 +1,4 @@
+#include <asm/io.h>
 #include <linux/init.h>
 #include <linux/interrupt.h>
 #include <linux/module.h>
@@ -27,8 +28,8 @@ static void	send_to_tty(char ch) {
 
 	if (!tty)
 		return ;
-	tty_insert_flip_char(&tty->port, ch, TTY_NORMAL);
-	tty_flip_buffer_push(&tty->port);
+	tty_insert_flip_char(tty->port, ch, TTY_NORMAL);
+	tty_flip_buffer_push(tty->port);
 }
 
 static irqreturn_t	kdb_irq_handler(int irq, void *dev_id)
@@ -65,11 +66,11 @@ static int __init hello_1_init(void)
 
 static void __exit hello_1_exit(void)
 {
-	free_irq(DA_KEYBOARD_IRQ, (void *)(&my_dev));
+	free_irq(KEYB_IRQ, (void *)(&my_dev));
 	pr_info("unloading ft_atkbd\n");
 }
 
-late_initcall_init(hello_1_init);
+late_initcall(hello_1_init);
 module_exit(hello_1_exit);
 
 MODULE_LICENSE("GPL");
