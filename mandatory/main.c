@@ -124,7 +124,12 @@ static int __init dni_init(void)
 		pr_err("Failed to register misc device\n");
 		return ret;
 	}
-	register_keyboard_notifier(&keyboard_nb);
+	ret = register_keyboard_notifier(&keyboard_nb);
+	if (ret) {
+		misc_deregister(&device);
+		pr_err("Failed to register keyboard notifier\n");
+		return ret;
+	}
 	return 0;
 }
 
