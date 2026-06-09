@@ -48,9 +48,10 @@ static ssize_t	dni_read(struct file *file, char __user *out, size_t len, loff_t 
 	spin_lock_irqsave(&log_spinlock, flags);
 	list_for_each_entry(entry, &keystroke_list, list) {
 		int	n = snprintf(tmp_buf + total_size, 1024 * 64 - total_size,
-				     "%02d:%02d:%02d %s (%lld) %s\n",
+				     "%02d:%02d:%02d %s (%lld), ascii code : \'%c\',  %s\n",
 				     entry->tm.tm_hour, entry->tm.tm_min, entry->tm.tm_sec,
 				     entry->key.name, entry->key.keycode,
+				     entry->ascii ? entry->ascii : ' ',
 				     entry->down ? "Pressed" : "Released");
 		total_size += n;
 	}
@@ -140,9 +141,11 @@ static void __exit dni_exit(void)
 	misc_deregister(&device);
 	unregister_keyboard_notifier(&keyboard_nb);
 	list_for_each_entry(cursor, &keystroke_list, list) {
-		pr_info("%02d:%02d:%02d %s (%llu) %s\n",
+		pr_info("%02d:%02d:%02d %s (%llu), ascii : \'%c\', %s\n",
 			cursor->tm.tm_hour, cursor->tm.tm_min, cursor->tm.tm_sec,
-			cursor->key.name, cursor->key.keycode, cursor->down ? "pressed" : "released");
+			cursor->key.name, cursor->key.keycode,
+			cursor->ascii ? cursor->ascii : ' ';
+			cursor->down ? "pressed" : "released");
 	}
 	cleanup_logs();
 	pr_info("bye from the 42 keylogger\n");
