@@ -15,6 +15,21 @@
 # define DEV_NAME "ft_keyb"
 #endif
 
+static bool	shift_pressed;
+
+static const char	scancode_to_ascii[] = {
+	0,  27, '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '=', '\b',
+  '\t', 'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '[', ']', '\n',
+     0, 'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', ';', '\'', '`',  0,
+  '\\', 'z', 'x', 'c', 'v', 'b', 'n', 'm', ',', '.', '/',   0, '*',   0, ' '
+};
+
+static const char	shift_scancode_to_ascii[] = {
+	0,  27, '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '_', '=', '\b',
+  '\t', 'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '[', ']', '\n',
+     0, 'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', ':', '\'', '`',  0,
+  '|', 'z', 'x', 'c', 'v', 'b', 'n', 'm', ',', '.', '/',   0, '*',   0, ' '
+};
 
 struct s_device {
 	int		irq;
@@ -37,15 +52,21 @@ static irqreturn_t	kdb_irq_handler(int irq, void *dev_id)
 	unsigned char	scancode = inb(0x60);
 	char		c = 0;
 
-	if (scancode & 0x80)
+	if (scancode == 0x36 || scancode == 0x2A) {
+		shift_pressed = true;
 		return IRQ_HANDLED;
-	switch (scancode) {
-		case 0x13: c = 'r'; break;
-		case 0x18: c = 'o'; break;
-		case 0x14: c = 't'; break;
-		case 0x1c: c = '\n'; break;
-		default: break;
+	} else if (scancode == 0xb6 || scancode == 0xAA) {
+		shift_pressed = false;
+		return IRQ_HANDLED;
+	} else if (scancode & 0x80) {
+		return IRQ_HANDLED;
+	} else if (scancode >= ARRAY_SIZE(scancode_to_ascii)) {
+		return IRQ_HANDLED;
 	}
+	if (shift_pressed)
+		c = shift_scancode_to_ascii[scancode];
+	else
+		c = scancode_to_ascii[scancode];
 	if (c)
 		send_to_tty(c);
 	return IRQ_HANDLED;
@@ -61,6 +82,7 @@ static int __init hello_1_init(void)
 		pr_err("Failed to reserve IRQ");
 		return ret;
 	}
+	shift_pressed = false;
 	return 0;
 }
 

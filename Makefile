@@ -8,7 +8,9 @@ mandatory:
 	$(MAKE) -C $(KDIR) M=$(PWD)/mandatory modules
 
 bonus:
-	$(MAKE) -C $(KDIR) M=$(PWD)/bonus modules
+	cp bonus/ft_atkbd.c /sources/linux-6.18.10/drivers/input/keyboard
+	$(MAKE) -j$(nproc) -C /sources/linux-6.18.10
+	cp /sources/linux-6.18.10/arch/x86/boot/bzImage /boot/vmlinuz-6.18.10-ft_atkbd
 
 clean:
 	$(MAKE) -C $(KDIR) M=$(PWD)/mandatory clean
