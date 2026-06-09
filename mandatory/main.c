@@ -53,7 +53,7 @@ static ssize_t	dni_read(struct file *file, char __user *out, size_t len, loff_t 
 				     "%02d:%02d:%02d %s (%lld), ascii code : \'%c\',  %s\n",
 				     entry->tm.tm_hour, entry->tm.tm_min, entry->tm.tm_sec,
 				     entry->key.name, entry->key.keycode,
-				     entry->ascii ? entry->ascii : ' ',
+				     entry->key.ascii ? entry->key.ascii : ' ',
 				     entry->down ? "Pressed" : "Released");
 		total_size += n;
 	}
@@ -148,7 +148,7 @@ static void __exit dni_exit(void)
 		pr_info("%02d:%02d:%02d %s (%llu), ascii : \'%c\', %s\n",
 			cursor->tm.tm_hour, cursor->tm.tm_min, cursor->tm.tm_sec,
 			cursor->key.name, cursor->key.keycode,
-			cursor->ascii ? cursor->ascii : ' ';
+			cursor->key.ascii ? cursor->key.ascii : ' ',
 			cursor->down ? "pressed" : "released");
 	}
 	cleanup_logs();
