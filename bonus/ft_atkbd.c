@@ -57,9 +57,9 @@ static int __init hello_1_init(void)
 		ret = -ENOMEM;
 		goto err_free_irq;
 	}
-	set_bit(EV_KEY; ft_keyboard->evbit);
+	set_bit(EV_KEY, ft_keyboard->evbit);
 	for (int i = 0; i <= MAX_KEY; i++)
-		setbit(i, ft_keyboard->keybit);
+		set_bit(i, ft_keyboard->keybit);
 	ret = input_register_device(ft_keyboard);
 	if (ret) {
 		printk(KERN_ERR "ft_atkbd.c: Failed to register device\n");
