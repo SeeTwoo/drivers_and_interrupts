@@ -69,14 +69,14 @@ static int __init hello_1_init(void)
 err_free_dev:
 	input_free_device(ft_keyboard);
 err_free_irq:
-	free_irq(KEYB_IRQ, (void *)(&my_dev));;;;;;;;
+	free_irq(KEYB_IRQ, (void *)(&my_dev));
 	return ret;
 }
 
 static void __exit hello_1_exit(void)
 {
-	free_irq(KEYB_IRQ, (void *)(&my_dev));
 	input_unregister_device(ft_keyboard);
+	free_irq(KEYB_IRQ, (void *)(&my_dev));
 	pr_info("unloading ft_atkbd\n");
 }
 
