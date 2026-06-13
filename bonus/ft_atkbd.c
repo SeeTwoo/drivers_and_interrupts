@@ -16,62 +16,30 @@
 # define DEV_NAME "ft_keyb"
 #endif
 
-static bool	shift_pressed;
-
-static const char	scancode_to_ascii[] = {
-	0,  27, '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '=', '\b',
-  '\t', 'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '[', ']', '\n',
-     0, 'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', ';', '\'', '`',  0,
-  '\\', 'z', 'x', 'c', 'v', 'b', 'n', 'm', ',', '.', '/',   0, '*',   0, ' '
-};
-
-static const char	shift_scancode_to_ascii[] = {
-	0,  27, '!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '_', '+', '\b',
-  '\t', 'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P', '{', '}', '\n',
-     0, 'A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', ':', '\"', '`',  0,
-  '|', 'Z', 'X', 'C', 'V', 'B', 'N', 'M', '<', '>', '?',   0, '*',   0, ' '
-};
-
 struct s_device {
 	int		irq;
 	void __iomem	*regs;
 };
 
+static struct input_dev	*ft_keyboard;
+
 static struct s_device	my_dev;
-
-static void	send_to_tty(char ch) {
-	struct tty_struct	*tty = vc_cons[fg_console].d->port.tty;
-
-	if (!tty)
-		return ;
-	tty_insert_flip_char(tty->port, ch, TTY_NORMAL);
-	tty_flip_buffer_push(tty->port);
-}
 
 static irqreturn_t	kdb_irq_handler(int irq, void *dev_id)
 {
 	unsigned char	scancode = inb(0x60);
-	char		c = 0;
+	int		value = 1;
 
-	if (scancode == 0x36 || scancode == 0x2A) {
-		shift_pressed = true;
-		return IRQ_HANDLED;
-	} else if (scancode == 0xb6 || scancode == 0xAA) {
-		shift_pressed = false;
-		return IRQ_HANDLED;
-	} else if (scancode & 0x80) {
-		return IRQ_HANDLED;
-	} else if (scancode >= ARRAY_SIZE(scancode_to_ascii)) {
-		return IRQ_HANDLED;
+	if (scancode & 0x80) {
+		scancode -= 0x80;
+		value = 0;
 	}
-	if (shift_pressed)
-		c = shift_scancode_to_ascii[scancode];
-	else
-		c = scancode_to_ascii[scancode];
-	if (c)
-		send_to_tty(c);
+	input_report_key(ft_keyboard, scancode, value);
+	input_sync(ft_keyboard);
 	return IRQ_HANDLED;
 }
+
+#define MAX_KEY 0x58
 
 static int __init hello_1_init(void)
 {
@@ -83,13 +51,32 @@ static int __init hello_1_init(void)
 		pr_err("Failed to reserve IRQ");
 		return ret;
 	}
-	shift_pressed = false;
+	ft_keyboard = input_allocate_device();
+	if (!ft_keyboard) {
+		printk(KERN_ERR "ft_atkbd.c: Not enough memory\n");
+		ret = -ENOMEM;
+		goto err_free_irq;
+	}
+	set_bit(EV_KEY; ft_keyboard->evbit);
+	for (int i = 0; i <= MAX_KEY; i++)
+		setbit(i, ft_keyboard->keybit);
+	ret = input_register_device(ft_keyboard);
+	if (ret) {
+		printk(KERN_ERR "ft_atkbd.c: Failed to register device\n");
+		goto err_free_dev;
+	}
 	return 0;
+err_free_dev:
+	input_free_device(ft_keyboard);
+err_free_irq:
+	free_irq(KEYB_IRQ, (void *)(&my_dev));;;;;;;;
+	return ret;
 }
 
 static void __exit hello_1_exit(void)
 {
 	free_irq(KEYB_IRQ, (void *)(&my_dev));
+	input_unregister_device(ft_keyboard);
 	pr_info("unloading ft_atkbd\n");
 }
 
