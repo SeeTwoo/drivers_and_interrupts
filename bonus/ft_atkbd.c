@@ -550,8 +550,8 @@ static int	is_extended = 0;
 
 static irqreturn_t	kdb_irq_handler(int irq, void *dev_id)
 {
-	unsigned char	scancode = inb(0x60);
-	unsigned short	*table = is_extended ? ft_scancodes_ext : ft_scancodes_std;
+	unsigned char		scancode = inb(0x60);
+	const unsigned short	*table = is_extended ? ft_scancodes_ext : ft_scancodes_std;
 
 	if (scancode == 0xE0) {
 		is_extended = 1;
