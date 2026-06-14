@@ -550,7 +550,7 @@ static irqreturn_t	kdb_irq_handler(int irq, void *dev_id)
 {
 	unsigned char	scancode = inb(0x60);
 
-	input_report_key(ft_keyboard, ft_scancode_std[scancode & 0x7F], !(scancode & 0x80));
+	input_report_key(ft_keyboard, ft_scancodes_std[scancode & 0x7F], !(scancode & 0x80));
 	input_sync(ft_keyboard);
 	return IRQ_HANDLED;
 }
@@ -582,6 +582,12 @@ static int __init hello_1_init(void)
 		printk(KERN_ERR "ft_atkbd.c: Failed to register device\n");
 		goto err_free_dev;
 	}
+	ft_keyboard->name = "ft_keyboard";
+	ft_keyboard->phys = "ft_keyb/input0";
+	ft_keyboard->id.bustype = BUS_ISA;
+	ft_keyboard->id.vendor = 0x0001;
+	ft_keyboard->id.product = 0x0001;
+	ft_keyboard->id.version = 0x0100;
 	return 0;
 err_free_dev:
 	input_free_device(ft_keyboard);
