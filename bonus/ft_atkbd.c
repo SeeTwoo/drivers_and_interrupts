@@ -537,9 +537,10 @@ static const unsigned short ft_scancodes_ext[256] = {
 };
 // [MAP_END]
 
-struct s_device {
+struct s_ft_dev {
 	int		irq;
 	void __iomem	*regs;
+	int		is_extended;
 };
 
 static struct input_dev	*ft_keyboard;
