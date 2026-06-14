@@ -523,7 +523,7 @@ static const unsigned short ft_scancodes_ext[256] = {
     [242] = KEY_RESERVED,
     [243] = KEY_RESERVED,
     [244] = KEY_RESERVED,
-    [245] = KEY_RESERVED,he devices. is it bad ?
+    [245] = KEY_RESERVED,
     [246] = KEY_RESERVED,
     [247] = KEY_RESERVED,
     [248] = KEY_RESERVED,
@@ -551,7 +551,7 @@ static int	is_extended = 0;
 static irqreturn_t	kdb_irq_handler(int irq, void *dev_id)
 {
 	unsigned char	scancode = inb(0x60);
-	unsigned short	table = is_extended ? ft_scancodes_ext : ft_scancodes_std;
+	unsigned short	*table = is_extended ? ft_scancodes_ext : ft_scancodes_std;
 
 	if (scancode == 0xE0) {
 		is_extended = 1;
