@@ -545,21 +545,22 @@ struct s_ft_dev {
 
 static struct input_dev	*ft_keyboard;
 
-static struct s_device	my_dev;
+static struct s_ft_dev	my_dev;
 
-static int	is_extended = 0;
+//static int	is_extended = 0;
 
 static irqreturn_t	kdb_irq_handler(int irq, void *dev_id)
 {
+	struct s_ft_dev		*keyboard = (struct s_ft_dev *)dev_id;
 	unsigned char		scancode = inb(0x60);
-	const unsigned short	*table = is_extended ? ft_scancodes_ext : ft_scancodes_std;
+	const unsigned short	*table = keyboard->is_extended ? ft_scancodes_ext : ft_scancodes_std;
 
 	if (scancode == 0xE0) {
-		is_extended = 1;
+		keyboard->is_extended = 1;
 		return IRQ_HANDLED;
 	}
-	if (is_extended)
-		is_extended = 0;
+	if (keyboard->is_extended)
+		keyboard->is_extended = 0;
 	input_report_key(ft_keyboard, table[scancode & 0x7F], !(scancode & 0x80));
 	input_sync(ft_keyboard);
 	return IRQ_HANDLED;
@@ -598,6 +599,7 @@ static int __init hello_1_init(void)
 	ft_keyboard->id.vendor = 0x0001;
 	ft_keyboard->id.product = 0x0001;
 	ft_keyboard->id.version = 0x0100;
+	my_dev.is_extended = 0;
 	return 0;
 err_free_dev:
 	input_free_device(ft_keyboard);
