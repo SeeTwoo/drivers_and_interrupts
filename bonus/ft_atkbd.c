@@ -568,7 +568,7 @@ static irqreturn_t	kdb_irq_handler(int irq, void *dev_id)
 
 #define MAX_KEY 0x58
 
-static int __init hello_1_init(void)
+static int __init ft_atkbd_init(void)
 {
 	pr_info("loading ft_atkbd\n");
 
@@ -608,14 +608,14 @@ err_free_irq:
 	return ret;
 }
 
-static void __exit hello_1_exit(void)
+static void __exit ft_atkbd_exit(void)
 {
 	input_unregister_device(ft_keyboard);
 	free_irq(KEYB_IRQ, (void *)(&my_dev));
 	pr_info("unloading ft_atkbd\n");
 }
 
-late_initcall(hello_1_init);
-module_exit(hello_1_exit);
+late_initcall(ft_atkbd_init);
+module_exit(ft_atkbd_exit);
 
 MODULE_LICENSE("GPL");
